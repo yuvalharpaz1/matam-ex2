@@ -1,0 +1,6 @@
+﻿  main.c
+C:\Users\יובל\source\repos\ex2\Caesar\second_step.h(7,1): warning C4005: 'ERROR': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\wingdi.h(118): message : see previous definition of 'ERROR'
+C:\Users\יובל\source\repos\ex2\Caesar\main.c(13,19): warning C4101: 'len': unreferenced local variable
+C:\Users\יובל\source\repos\ex2\Caesar\main.c(15,31): warning C4101: 'c': unreferenced local variable
+  Caesar.vcxproj -> C:\Users\יובל\source\repos\ex2\Debug\Caesar.exe
