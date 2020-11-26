@@ -1,18 +1,17 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <windows.h>
 #include <strsafe.h>
 #include "caesar_tranlate.h"
 #include "first_step.h"
 #include "second_step.h"
 
-#define ERROR -1
-
 int main(int argc, char* argv[])
 {
 	HANDLE h_file, h_append;
-	int key, thread, len, lines;
+	int key, thread, lines;
 	int char_counter = 0;
-	char read_buffer, translate, c;
+	char read_buffer, translate, c, path[_MAX_PATH];
 	DWORD bytes_read, bytes_write;
 	if (argc != 4)
 	{
@@ -45,11 +44,14 @@ int main(int argc, char* argv[])
 	}
 	// Open the existing file, or if the file does not exist,
 	// create a new file.
-	h_append = CreateFileA("decrypted.txt", // open mytestfiletwo.txt
+	strcpy_s(path, _MAX_PATH, file_path(argv[1]));
+	strcat_s(path, _MAX_PATH, "decrypted.txt");
+	printf("%s\n", path);
+	h_append = CreateFileA(path, // open mytestfiletwo.txt
 		GENERIC_WRITE, // open for writing
 		FILE_SHARE_WRITE, // share for writing
 		NULL, // default security
-		OPEN_ALWAYS, // open or create
+		CREATE_ALWAYS, // open or create
 		FILE_ATTRIBUTE_NORMAL, // normal file
 		NULL); // no attribute template
 
@@ -62,14 +64,14 @@ int main(int argc, char* argv[])
 		printf("%s\n", argv[j]);
 	}
 
-	location* locations=(location*)malloc(thread * sizeof(location*));
+	location* locations=(location*)malloc(thread * sizeof(location));
 	if (NULL == locations)
 	{
 		free(locations);
 		fprintf(stderr, "Error: memory allocation failed\n");
 		return -1;
 	}
-	int* threads = (int*)malloc(thread * sizeof(int*));
+	int* threads = (int*)malloc(thread * sizeof(int));
 	if (NULL == threads)
 	{
 		free(threads);
@@ -83,6 +85,7 @@ int main(int argc, char* argv[])
 		return ERROR;
 	}
 	lines_in_thread(threads, thread, lines);
+	
 	for(int i=0;i<thread;i++)
 	{
 		printf("%d\n",threads[i]);
@@ -91,6 +94,7 @@ int main(int argc, char* argv[])
 	locations[0].start = 0;
 	int thread_num = 0;
 	int line_counter = 0;
+	int i = 0;
 	do
 	{
 		if (FALSE == ReadFile(h_file, &read_buffer, 1, &bytes_read, NULL))
@@ -112,7 +116,7 @@ int main(int argc, char* argv[])
 					locations[thread_num].end = char_counter;
 					line_counter = 0;
 					thread_num++;
-					if(thread_num<thread)
+					if (thread_num < thread)
 						locations[thread_num].start = char_counter + 1;
 				}
 			}
@@ -128,14 +132,19 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
+		/*if (i == 102)
+			i = i;
+		i++;*/
 	} while (bytes_read != 0);
+	//printf("%d\n", i);
 
-	for(int i=0;i<thread;i++)
+	/*for(int i=0;i<thread;i++)
 	{
-		printf("%d ,%d\n", locations[i].start, locations[i].end);
-	}
-	printf("\n%d\n", char_counter);
-	//free(threads);
+		printf("%d\n", locations[i].start, locations[i].end);
+	}*/
+	//printf("%d\n", char_counter);
+	//printf("%d\n", threads[2]);
+	free(threads);
 	// Close both files.
 	if (CloseHandle(h_file) != 0)
 		fprintf(stderr,"\n%s file handle closed successfully!\n", argv[1]);
