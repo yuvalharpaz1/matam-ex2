@@ -140,13 +140,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="caesar_translate.c" />
+    <ClCompile Include="create_thread.c" />
     <ClCompile Include="first_step.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="second_step.c" />
+    <ClCompile Include="translate_thread.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="caesar_tranlate.h" />
     <ClInclude Include="first_step.h" />
+    <ClInclude Include="hard_coded_data.h" />
     <ClInclude Include="second_step.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
