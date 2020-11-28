@@ -5,6 +5,7 @@
 #include "caesar_tranlate.h"
 #include "first_step.h"
 #include "second_step.h"
+#include "create_thread.h"
 
 int main(int argc, char* argv[])
 {
@@ -108,6 +109,7 @@ int main(int argc, char* argv[])
 		//DisplayError(TEXT("CreateFile"));
 		//_tprintf(TEXT("Terminal failure: unable to open file \"%s\" for read.\n"), argv[1]);
 		fprintf(stderr, "Could not open %s!.\n", argv[1]);
+		CloseHandle(h_file);
 		return ERROR;
 	}
 	// Open the existing file, or if the file does not exist,
@@ -123,6 +125,8 @@ int main(int argc, char* argv[])
 
 	if (h_append == INVALID_HANDLE_VALUE) {
 		fprintf(stderr, "Could not open %s!.\n", path);
+		CloseHandle(h_append);
+		CloseHandle(h_file);
 		return ERROR;
 	}
 
@@ -130,7 +134,7 @@ int main(int argc, char* argv[])
 	{
 		printf("%s\n", argv[j]);
 	}
-	
+	SetFilePointer(h_file, 0, 0, FILE_BEGIN);
 	//Read file
 	locations[0].start = 0;
 	int thread_num = 0;
@@ -173,38 +177,31 @@ int main(int argc, char* argv[])
 			}
 		}
 	} while (bytes_read != 0);
+	SetFilePointer(h_file, 0, 0, FILE_BEGIN);
 	for (int i = 0; i < thread; i++)
 	{
 		printf("%d ,%d\n", locations[i].start, locations[i].end);
 	}
 	printf("%d\n", char_counter);
-	SetFilePointer(h_append, char_counter, FILE_BEGIN);
+	SetFilePointer(h_append, char_counter, 0, FILE_BEGIN);
 	SetEndOfFile(h_append);
 
 	if (CloseHandle(h_file) != 0)
 		fprintf(stderr,"\n%s file handle closed successfully!\n", argv[1]);
 
-	h_file = CreateFileA(argv[1],               // file to open
-		GENERIC_READ,          // open for reading
-		FILE_SHARE_READ,       // share for reading
-		NULL,                  // default security
-		OPEN_EXISTING,         // existing file only
-		FILE_ATTRIBUTE_NORMAL, // normal file
-		NULL);                 // no attr. template
-	if (h_file == INVALID_HANDLE_VALUE)
-	{
-		//DisplayError(TEXT("CreateFile"));
-		//_tprintf(TEXT("Terminal failure: unable to open file \"%s\" for read.\n"), argv[1]);
-		fprintf(stderr, "Could not open %s!.\n", argv[1]);
-		return ERROR;
-	}
-
-
-	free(threads);
-	// Close both files.
-	if (CloseHandle(h_file) != 0)
-		fprintf(stderr,"\n%s file handle closed successfully!\n", argv[1]);
 	if (CloseHandle(h_append) != 0)
-		fprintf(stderr,"%s file handle closed successfully!\n", "decrypted.txt");
+		fprintf(stderr, "%s file handle closed successfully!\n", path);
+
+	//// end of second open
+
+	int retval;
+	retval=create_threads(thread, argv[1], path, locations, key);
+	if(retval!=0)
+	{
+		fprintf(stderr,"Could not create thread!\n");
+	}
+	free(line_locations);
+	free(locations);
+	free(threads);
 	return 0;
 }

@@ -47,5 +47,11 @@
     <ClInclude Include="hard_coded_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="translate_thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="create_thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

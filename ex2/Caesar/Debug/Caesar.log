@@ -1,6 +1,9 @@
-﻿  main.c
+﻿  create_thread.c
 C:\Users\יובל\source\repos\ex2\Caesar\second_step.h(8,1): warning C4005: 'ERROR': macro redefinition
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\wingdi.h(118): message : see previous definition of 'ERROR'
-C:\Users\יובל\source\repos\ex2\Caesar\main.c(97,20): warning C4101: 'translate': unreferenced local variable
-C:\Users\יובל\source\repos\ex2\Caesar\main.c(96,20): warning C4101: 'bytes_write': unreferenced local variable
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(59,27): warning C4047: 'function': 'char *' differs in levels of indirection from 'char *[260]'
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(59,20): warning C4024: 'strcpy_s': different types for formal and actual parameter 1
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(60,29): warning C4047: 'function': 'char *' differs in levels of indirection from 'char *[260]'
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(60,20): warning C4024: 'strcpy_s': different types for formal and actual parameter 1
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(95,16): warning C4018: '<': signed/unsigned mismatch
   Caesar.vcxproj -> C:\Users\יובל\source\repos\ex2\Debug\Caesar.exe

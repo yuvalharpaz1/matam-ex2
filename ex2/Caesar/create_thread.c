@@ -1,7 +1,5 @@
-// CreateThreadTidyDemonstration.c
 
 /*
-* This is the same program as Example03, written 
 * 
 * This program demonstrates simple thread usage.
 * It solves the problem demonstrated in Example02 by running each task in
@@ -13,13 +11,7 @@
 
 // Includes --------------------------------------------------------------------
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <windows.h>
-// Constants -------------------------------------------------------------------
-
-#define BRUTAL_TERMINATION_CODE 0x55
-#define ERROR_CODE ((int)(-1))
+#include "create_thread.h"
 
 // Function Declarations -------------------------------------------------------
 
@@ -41,12 +33,10 @@
 * Notes:
 *   This function is just a wrapper for CreateThread.
 */
-static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine,
-	LPDWORD p_thread_id);
 
 // Function Definitions --------------------------------------------------------
 
-int create_threads(int threads_num)
+int create_threads(int threads_num, char* input_file, char* output_file, location* locations, int key)
 {
 	HANDLE* p_thread_handles=(HANDLE*)malloc(threads_num * sizeof(HANDLE));
 	if (NULL == p_thread_handles)
@@ -65,30 +55,42 @@ int create_threads(int threads_num)
 	DWORD wait_code;
 	BOOL ret_val;
 	size_t i;
+	thread_info arguments;
+	strcpy_s(arguments.infile, _MAX_PATH, input_file);
+	strcpy_s(arguments.outfile , _MAX_PATH, output_file);
+	arguments.key = key;
 	// Create two threads, each thread performs on task.
-	p_thread_handles[0] = CreateThreadSimple(IOThread, &p_thread_ids[0]);
-	p_thread_handles[1] = CreateThreadSimple(CommunicationThread, &p_thread_ids[1]);
+	for(int i=0;i<threads_num;i++)
+	{
+		arguments.start = locations[i].start;
+		arguments.end = locations[i].end;
+		printf("%d||%d\n", arguments.start,arguments.end);
+		p_thread_handles[i] = CreateThreadSimple(translate_thread, &p_thread_ids[i], &arguments);
+	}
 
 	// Wait for IO thread to receive exit command and terminate
-	wait_code = WaitForSingleObject(p_thread_handles[0], INFINITE);
+	//wait_code = WaitForSingleObject(p_thread_handles[0], INFINITE);
+	wait_code = WaitForMultipleObjects(threads_num, p_thread_handles, TRUE, INFINITE);
 	if (WAIT_OBJECT_0 != wait_code)
 	{
 		printf("Error when waiting");
 		return ERROR_CODE;
 	}
-
 	// Terminate the other thread
 	// Normally, we would avoid terminating a thread so brutally,
 	// because it might be in the middle of an operation that should not
 	// be interrupted (like writing a file).
 	// There are gentler ways of terminating a thread.
-	ret_val = TerminateThread(p_thread_handles[1], BRUTAL_TERMINATION_CODE);
-	if (false == ret_val)
+	for(int i=0;i<threads_num;i++)
 	{
-		printf("Error when terminating\n");
-		return ERROR_CODE;
+		ret_val = TerminateThread(p_thread_handles[i], GetLastError());
+		if (false == ret_val)
+		{
+			printf("Error when terminating\n");
+			return ERROR_CODE;
+		}
 	}
-
+	
 	// Close thread handles
 	for (i = 0; i < threads_num; i++)
 	{
@@ -99,13 +101,14 @@ int create_threads(int threads_num)
 			return ERROR_CODE;
 		}
 	}
+	free(p_thread_handles);
+	free(p_thread_ids);
+	return 0;
 }
 
-static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine,
-	LPDWORD p_thread_id)
+static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine, LPDWORD p_thread_id, thread_info *arguments)
 {
 	HANDLE thread_handle;
-
 	if (NULL == p_start_routine)
 	{
 		printf("Error when creating a thread");
@@ -124,7 +127,7 @@ static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine,
 		NULL,            /*  default security attributes */
 		0,               /*  use default stack size */
 		p_start_routine, /*  thread function */
-		NULL,            /*  argument to thread function */
+		arguments,       /*  argument to thread function */
 		0,               /*  use default creation flags */
 		p_thread_id);    /*  returns the thread identifier */
 
@@ -133,6 +136,5 @@ static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine,
 		printf("Couldn't create thread\n");
 		exit(ERROR_CODE);
 	}
-
 	return thread_handle;
 }
