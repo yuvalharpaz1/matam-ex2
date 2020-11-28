@@ -1,11 +1,13 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <windows.h>
-#include "caesar_tranlate.h"
+#include "translate_thread.h"
 
-DWORD WINAPI translate_thread(char* input_file, char* output_file, int start, int end, int key)
+DWORD WINAPI translate_thread(LPVOID lpParam)
 {
+	thread_info* thread_cmd = (thread_info*)lpParam;
+	char* input_file = thread_cmd->infile;
+	char* output_file = thread_cmd->outfile;
+	int key = thread_cmd->key;
+	int start = thread_cmd->start;
+	int end = thread_cmd->end;
 	HANDLE h_file, h_append;
 	DWORD bytes_read, bytes_write;
 	char read_buffer, translate;
@@ -49,17 +51,25 @@ DWORD WINAPI translate_thread(char* input_file, char* output_file, int start, in
 			CloseHandle(h_file);
 			return ERROR;
 		}
-		else
+		else if (bytes_read==1)
 		{
+			//printf("%c=", read_buffer);
 			translate = char_through_caesar(read_buffer, key);
+			//printf("%c\n", translate);
 			if (FALSE == WriteFile(h_append, &translate, 1, &bytes_write, NULL))
 			{
 				fprintf(stderr, "File not written to.\n");
 				return ERROR;
 			}
+			printf("%c", translate);
 		}
 	}
 	CloseHandle(h_file);
-	closehandle(h_append);
+	CloseHandle(h_append);
+	// Close both files.
+	/*if (CloseHandle(h_file) != 0)
+		fprintf(stderr,"\n%s file handle closed successfully!\n", input_file);
+	if (CloseHandle(h_append) != 0)
+		fprintf(stderr,"%s file handle closed successfully!\n", output_file);*/
 	return 0;
 }

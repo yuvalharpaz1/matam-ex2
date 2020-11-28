@@ -148,9 +148,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="caesar_tranlate.h" />
+    <ClInclude Include="create_thread.h" />
     <ClInclude Include="first_step.h" />
     <ClInclude Include="hard_coded_data.h" />
     <ClInclude Include="second_step.h" />
+    <ClInclude Include="translate_thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
