@@ -18,32 +18,17 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="caesar_translate.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="first_step.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="second_step.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="create_thread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="translate_thread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="info_to_threads.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="caesar_tranlate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="first_step.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="second_step.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="hard_coded_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="create_thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="info_to_threads.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

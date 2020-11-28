@@ -94,7 +94,7 @@ int create_threads(int threads_num, char* input_file, char* output_file, locatio
 			//Sleep(10);
 			}
 		}
-		return ERROR_CODE;
+		return ERROR;
 		break;
 	default:
 		printf("Error code is %x\n", wait_code);
@@ -112,7 +112,7 @@ int create_threads(int threads_num, char* input_file, char* output_file, locatio
 		if (false == ret_val)
 		{
 			printf("Error when closing\n");
-			return ERROR_CODE;
+			return ERROR;
 		}
 	}
 	free(p_thread_handles);
@@ -128,14 +128,14 @@ static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine, LPDWORD
 	{
 		printf("Error when creating a thread\n");
 		printf("Received null pointer");
-		exit(ERROR_CODE);
+		exit(ERROR);
 	}
 
 	if (NULL == p_thread_id)
 	{
 		printf("Error when creating a thread\n");
 		printf("Received null pointer");
-		exit(ERROR_CODE);
+		exit(ERROR);
 	}
 
 	thread_handle =  CreateThread(
@@ -149,7 +149,7 @@ static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine, LPDWORD
 	if (NULL == thread_handle)
 	{
 		printf("Couldn't create thread\n");
-		exit(ERROR_CODE);
+		exit(ERROR);
 	}
 
 	return thread_handle;

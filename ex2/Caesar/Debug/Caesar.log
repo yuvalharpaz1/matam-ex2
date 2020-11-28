@@ -1,6 +1,23 @@
-﻿  main.c
-C:\Users\יובל\source\repos\ex2\Caesar\second_step.h(8,1): warning C4005: 'ERROR': macro redefinition
+﻿  create_thread.c
+C:\Users\יובל\source\repos\ex2\Caesar\hard_coded_data.h(4,1): warning C4005: 'ERROR': macro redefinition
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\wingdi.h(118): message : see previous definition of 'ERROR'
-C:\Users\יובל\source\repos\ex2\Caesar\main.c(119,20): warning C4101: 'translate': unreferenced local variable
-C:\Users\יובל\source\repos\ex2\Caesar\main.c(118,20): warning C4101: 'bytes_write': unreferenced local variable
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(66,11): warning C4018: '<': signed/unsigned mismatch
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(68,31): warning C4047: 'function': 'char *' differs in levels of indirection from 'char *[260]'
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(68,24): warning C4024: 'strcpy_s': different types for formal and actual parameter 1
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(69,33): warning C4047: 'function': 'char *' differs in levels of indirection from 'char *[260]'
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(69,24): warning C4024: 'strcpy_s': different types for formal and actual parameter 1
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(73,10): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'char **'
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(73,10): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 2 has type 'char **'
+C:\Users\יובל\source\repos\ex2\Caesar\create_thread.c(109,16): warning C4018: '<': signed/unsigned mismatch
+  main.c
+C:\Users\יובל\source\repos\ex2\Caesar\hard_coded_data.h(4,1): warning C4005: 'ERROR': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\wingdi.h(118): message : see previous definition of 'ERROR'
+C:\Users\יובל\source\repos\ex2\Caesar\main.c(76,18): warning C4047: '==': 'location *' differs in levels of indirection from 'int'
+  translate_thread.c
+C:\Users\יובל\source\repos\ex2\Caesar\hard_coded_data.h(4,1): warning C4005: 'ERROR': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\wingdi.h(118): message : see previous definition of 'ERROR'
+C:\Users\יובל\source\repos\ex2\Caesar\translate_thread.c(6,1): warning C4047: 'initializing': 'char *' differs in levels of indirection from 'char **'
+C:\Users\יובל\source\repos\ex2\Caesar\translate_thread.c(7,1): warning C4047: 'initializing': 'char *' differs in levels of indirection from 'char **'
+C:\Users\יובל\source\repos\ex2\Caesar\translate_thread.c(86,18): warning C4047: 'return': 'char' differs in levels of indirection from 'void *'
+  Generating Code...
   Caesar.vcxproj -> C:\Users\יובל\source\repos\ex2\Debug\Caesar.exe
