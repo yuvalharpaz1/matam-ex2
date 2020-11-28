@@ -5,6 +5,7 @@
 #include "caesar_tranlate.h"
 #include "first_step.h"
 #include "second_step.h"
+#include "create_thread.h"
 
 int main(int argc, char* argv[])
 {
@@ -15,25 +16,46 @@ int main(int argc, char* argv[])
 	int char_counter = 0;
 	char path[_MAX_PATH];
 	
-	if (argc != 4)
+	if (argc != 5)
 	{
 		fprintf(stderr, "Error: invalid number of arguments (%d instead of 1)\n", argc - 1);
 		return ERROR;
 	}
-	if (key_is_positive(argv[2][0]))
-		key = str2int(argv[2]);
-	else
-		key = -1 * str2int(argv[2]);
-	thread = str2int(argv[3]);
-	if (thread < 1)
+	key = str2int(argv[2]);
+	if (key < 0)
 	{
-		fprintf(stderr, "Error: invalid number of threads\n");
+		fprintf(stderr, "Error: invalid key\n");
 		return ERROR;
 	}
-
+	if (key_is_positive(argv[2][0])==FALSE)
+	{				
+		key = -1 * str2int(argv[2]);
+	}	
+	thread = str2int(argv[3]);
+	if (thread < 1 ||key_is_positive(argv[3][0])==FALSE)
+	{
+		fprintf(stderr, "Error: invalid thread\n");
+		return ERROR;
+	}
+	printf("thread is:%d\n", thread);
+	printf("before key is:%d\n", key);
 	strcpy_s(path, _MAX_PATH, file_path(argv[1]));
-	strcat_s(path, _MAX_PATH, "decrypted.txt");
-	printf("%s\n", path);
+
+	if (strcmp(argv[4],"-e")==0)
+	{
+		key = -key;
+		strcat_s(path, _MAX_PATH, "encrypted.txt");
+	}
+	else if(strcmp(argv[4], "-d") == 0)
+		strcat_s(path, _MAX_PATH, "decrypted.txt");
+	else
+	{
+		fprintf(stderr, "Error: invalid encryption flag\n");
+		return ERROR;
+	}
+	printf("after key is:%d\n", key);
+
+	printf("path is:%s\n", path);
 
 	location* line_locations = (location*)malloc(sizeof(location));
 	if (NULL == line_locations)
@@ -64,7 +86,7 @@ int main(int argc, char* argv[])
 		lines = count_lines(infile);
 		//locations_of_lines(infile, &line_locations, lines);
 	}
-	printf("%d\n", lines);
+	printf("lines:%d\n", lines);
 	if (lines == -1)
 	{
 		return ERROR;
@@ -77,7 +99,7 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < thread; i++)
 	{
-		printf("%d\n", threads[i]);
+		printf("line %d is:%d\n", i,threads[i]);
 	}
 
 	location* locations = (location*)malloc(thread * sizeof(location));
@@ -108,6 +130,7 @@ int main(int argc, char* argv[])
 		//DisplayError(TEXT("CreateFile"));
 		//_tprintf(TEXT("Terminal failure: unable to open file \"%s\" for read.\n"), argv[1]);
 		fprintf(stderr, "Could not open %s!.\n", argv[1]);
+		CloseHandle(h_file);
 		return ERROR;
 	}
 	// Open the existing file, or if the file does not exist,
@@ -123,14 +146,16 @@ int main(int argc, char* argv[])
 
 	if (h_append == INVALID_HANDLE_VALUE) {
 		fprintf(stderr, "Could not open %s!.\n", path);
+		CloseHandle(h_append);
+		CloseHandle(h_file);
 		return ERROR;
 	}
 
 	for (int j = 0; j < argc; j++)
 	{
-		printf("%s\n", argv[j]);
+		printf("argv[%d] is : %s\n", j + 1, argv[j]);
 	}
-	
+	SetFilePointer(h_file, 0, 0, FILE_BEGIN);
 	//Read file
 	locations[0].start = 0;
 	int thread_num = 0;
@@ -173,38 +198,32 @@ int main(int argc, char* argv[])
 			}
 		}
 	} while (bytes_read != 0);
+	SetFilePointer(h_file, 0, 0, FILE_BEGIN);
 	for (int i = 0; i < thread; i++)
 	{
 		printf("%d ,%d\n", locations[i].start, locations[i].end);
 	}
 	printf("%d\n", char_counter);
-	SetFilePointer(h_append, char_counter, FILE_BEGIN);
+	SetFilePointer(h_append, char_counter, 0, FILE_BEGIN);
 	SetEndOfFile(h_append);
 
 	if (CloseHandle(h_file) != 0)
-		fprintf(stderr,"\n%s file handle closed successfully!\n", argv[1]);
+		fprintf(stderr,"%s file handle closed successfully!\n", argv[1]);
 
-	h_file = CreateFileA(argv[1],               // file to open
-		GENERIC_READ,          // open for reading
-		FILE_SHARE_READ,       // share for reading
-		NULL,                  // default security
-		OPEN_EXISTING,         // existing file only
-		FILE_ATTRIBUTE_NORMAL, // normal file
-		NULL);                 // no attr. template
-	if (h_file == INVALID_HANDLE_VALUE)
+	if (CloseHandle(h_append) != 0)
+		fprintf(stderr, "%s file handle closed successfully!\n", path);
+	printf("\n");
+	//// end of second open
+
+	int retval;
+	retval=create_threads(thread, argv[1], path, locations, key);
+	if(retval!=0)
 	{
-		//DisplayError(TEXT("CreateFile"));
-		//_tprintf(TEXT("Terminal failure: unable to open file \"%s\" for read.\n"), argv[1]);
-		fprintf(stderr, "Could not open %s!.\n", argv[1]);
-		return ERROR;
+		fprintf(stderr,"Could not create thread!\n");
 	}
 
-
+	free(line_locations);
+	free(locations);
 	free(threads);
-	// Close both files.
-	if (CloseHandle(h_file) != 0)
-		fprintf(stderr,"\n%s file handle closed successfully!\n", argv[1]);
-	if (CloseHandle(h_append) != 0)
-		fprintf(stderr,"%s file handle closed successfully!\n", "decrypted.txt");
 	return 0;
 }
