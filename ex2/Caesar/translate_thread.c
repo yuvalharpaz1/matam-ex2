@@ -49,6 +49,17 @@ DWORD WINAPI translate_thread(char* input_file, char* output_file, int start, in
 			CloseHandle(h_file);
 			return ERROR;
 		}
+		else
+		{
+			translate = char_through_caesar(read_buffer, key);
+			if (FALSE == WriteFile(h_append, &translate, 1, &bytes_write, NULL))
+			{
+				fprintf(stderr, "File not written to.\n");
+				return ERROR;
+			}
+		}
 	}
+	CloseHandle(h_file);
+	closehandle(h_append);
 	return 0;
 }
