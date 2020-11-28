@@ -74,3 +74,35 @@ DWORD WINAPI translate_thread(LPVOID lpParam)
 		fprintf(stderr,"%s file handle not closed successfully!\n", output_file);
 	return 0;
 }
+
+char char_type(char input_char)
+{
+	if (input_char >= 48 && input_char <= 57)
+		return DIGIT;
+	if (input_char >= 65 && input_char <= 90)
+		return CAPITAL;
+	if (input_char >= 97 && input_char <= 122)
+		return SMALL;
+	else return NULL;
+}
+
+char char_through_caesar(char input_char, int key)
+{
+	char output_char, type;
+	type = char_type(input_char);
+	switch (type)
+	{
+	case CAPITAL:
+		output_char = CAPITAL + (input_char - CAPITAL - key + 26) % 26;
+		break;
+	case SMALL:
+		output_char = SMALL + (input_char - SMALL - key + 26) % 26;
+		break;
+	case DIGIT:
+		output_char = DIGIT + (input_char - DIGIT - key + 10) % 10;
+		break;
+	default:
+		output_char = input_char;
+	}
+	return output_char;
+}
