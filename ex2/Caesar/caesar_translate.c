@@ -1,5 +1,7 @@
 #include "caesar_tranlate.h"
 
+#define ERROR -1
+
 char char_type(char input_char)
 {
 	if (input_char >= 48 && input_char <= 57)
@@ -36,12 +38,15 @@ int str2int(char *str)
 {
 	char c;
     int result = 0;
-    int sign = 1;
 	int i = 0;
 	if (str[0] == '-')
 	{
-		i++;
-		sign = -1;
+		if (47 < str[1] < 58)
+		{
+			i++;
+		}
+		else
+			return ERROR;
 	}
     while(str[i]!='\0') 
     {
