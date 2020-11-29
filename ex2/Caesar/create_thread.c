@@ -1,68 +1,44 @@
-
-/*
-* 
-* This program demonstrates simple thread usage.
-* It solves the problem demonstrated in Example02 by running each task in
-* it's own thread.
-* By doing so, it delegates the problem of scheduling the tasks to the OS.
-* Because the OS scheduler implenets a round robin mechanism, the tasks
-* appear to be running in parallel.
-*/
-
-// Includes --------------------------------------------------------------------
+//  create_threads.c will include functions that will receive data from main.c and create 
+//  threads according to it
 
 #include "create_thread.h"
 
-// Function Declarations -------------------------------------------------------
+#pragma warning(push)
+#pragma warning(disable:6386 6385)
 
-/*
-* A simplified API for creating threads.
-* Input Arguments:
-*   p_start_routine: A pointer to the function to be executed by the thread.
-*     This pointer represents the starting address of the thread.
-*     The function has to have this specific signature:
-*       DWORD WINAPI FunctionName(LPVOID lpParam);
-*     With FunctionName being replaced with the function's name.
-* Output Arguments:
-*   p_thread_id: A pointer to a variable that receives the thread identifier.
-*     If this parameter is NULL, the thread identifier is not returned.
-* Return:
-*   If the function succeeds, the return value is a handle to the new thread.
-*   If the function fails, the return value is NULL.
-*   To get extended error information, call GetLastError.
-* Notes:
-*   This function is just a wrapper for CreateThread.
-*/
-
-// Function Definitions --------------------------------------------------------
-
-int create_threads(int threads_num, char* input_file, char* output_file, location* locations, int key)
+//  A function that creates handles to threads simultaneity that read all the file in parallel
+//  Parameters:2 integers, 2 strings and a pointer to locations (struct location) array 
+//  Return: integer that evaluates if the function succeeded (0) or failed (-1)
+int create_threads(int threads_num, char input_file[_MAX_PATH], char output_file[_MAX_PATH], location* locations, int key)
 {
 	HANDLE* p_thread_handles=(HANDLE*)malloc(threads_num * sizeof(HANDLE));
 	if (NULL == p_thread_handles)
 	{
 		free(p_thread_handles);
 		fprintf(stderr, "Error: memory allocation failed\n");
-		exit(-1);
+		return ERROR_CODE;
 	}
 	DWORD* p_thread_ids = (DWORD*)malloc(threads_num * sizeof(DWORD));
 	if (NULL == p_thread_ids)
 	{
 		free(p_thread_ids);
+		free(p_thread_handles);
 		fprintf(stderr, "Error: memory allocation failed\n");
-		exit(-1);
+		return ERROR_CODE;
 	}
 	DWORD wait_code;
 	BOOL ret_val;
-	size_t i;
+	int i;
 	thread_info* arguments=(thread_info*)malloc(threads_num * sizeof(thread_info));
 	if (NULL == arguments)
 	{
 		free(arguments);
+		free(p_thread_ids);
+		free(p_thread_handles);
 		fprintf(stderr, "Error: memory allocation failed\n");
-		exit(-1);
+		return ERROR_CODE;
 	}
-	// Create two threads, each thread performs on task.
+	// Create threads, each thread performs a part of the file.
 	for(i=0;i<threads_num;i++)
 	{
 		strcpy_s(arguments[i].infile, _MAX_PATH, input_file);
@@ -70,13 +46,13 @@ int create_threads(int threads_num, char* input_file, char* output_file, locatio
 		arguments[i].key = key;
 		arguments[i].start = locations[i].start;
 		arguments[i].end = locations[i].end;
-		printf("%s,%s,%d,%d ,%d\n", arguments[i].infile, arguments[i].outfile, arguments[i].key,arguments[i].start, arguments[i].end);
-		printf("---------------\n");
-		p_thread_handles[i] = CreateThreadSimple(translate_thread, &p_thread_ids[i], &arguments[i]);
+		p_thread_handles[i] = create_thread_simple(translate_thread, &p_thread_ids[i], &arguments[i]);
 	}
+	printf("Handles successfully created!\n");
 
-	// Wait for IO thread to receive exit command and terminate
-	//wait_code = WaitForSingleObject(p_thread_handles[0], INFINITE);
+	DWORD exit_code;
+
+	// Wait for multiple threads to receive exit command and terminate
 	wait_code = WaitForMultipleObjects((DWORD)threads_num, p_thread_handles, TRUE, TIME_WAIT);
 	switch (wait_code)
 	{
@@ -85,26 +61,19 @@ int create_threads(int threads_num, char* input_file, char* output_file, locatio
 		break;
 	case WAIT_TIMEOUT:
 		printf("Error when waiting\n");
-		for(int i=0;i<threads_num;i++)
+		for (int i = 0; i < threads_num; i++)
 		{
-		ret_val = TerminateThread(p_thread_handles[i], GetLastError());
-		if (false == ret_val)
+			ExitThread(GetLastError());
+			if (!GetExitCodeThread(p_thread_handles[i], &exit_code))
 			{
-			printf("Error when terminating\n");
-			//Sleep(10);
+				printf("Error when terminating\n");
+				return ERROR_CODE;
+				break;
 			}
-		}
-		return ERROR_CODE;
-		break;
+		}	
 	default:
 		printf("Error code is %x\n", wait_code);
 	}
-	// Terminate the other thread
-	// Normally, we would avoid terminating a thread so brutally,
-	// because it might be in the middle of an operation that should not
-	// be interrupted (like writing a file).
-	// There are gentler ways of terminating a thread.
-	
 	// Close thread handles
 	for (i = 0; i < threads_num; i++)
 	{
@@ -115,12 +84,18 @@ int create_threads(int threads_num, char* input_file, char* output_file, locatio
 			return ERROR_CODE;
 		}
 	}
+	fprintf(stderr,"Handles successfully closed!\n");
+	free(arguments);
 	free(p_thread_handles);
 	free(p_thread_ids);
 	return 0;
 }
 
-static HANDLE CreateThreadSimple(LPTHREAD_START_ROUTINE p_start_routine, LPDWORD p_thread_id, thread_info *arguments)
+//  A function that creates handle to thread with its arguments
+//  Parameters: pointer to a function that notifies the host that a thread has started to execute, 
+//  pointer to DWORD and a pointer to the arguments (struct thread_info) array 
+//  Return: Handle to thread
+static HANDLE create_thread_simple(LPTHREAD_START_ROUTINE p_start_routine, LPDWORD p_thread_id, thread_info *arguments)
 {
 	HANDLE thread_handle;
 

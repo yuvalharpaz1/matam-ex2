@@ -1,5 +1,11 @@
+//  translate_thread.c will include functions that will receive data from create_thread.c
+//  and will translate the info according to the need in the main (key, d/e and so on)
+
 #include "translate_thread.h"
 
+//  A function that translates the threads simultaneity with the info from create_thread.c
+//  Parameters: args in create_thread.c
+//  Return: DWORD that evaluates if the function succeeded (0) or failed (-1)
 DWORD WINAPI translate_thread(LPVOID lpParam)
 {
 	thread_info* thread_cmd = (thread_info*)lpParam;
@@ -8,7 +14,6 @@ DWORD WINAPI translate_thread(LPVOID lpParam)
 	int key = thread_cmd->key;
 	int start = thread_cmd->start;
 	int end = thread_cmd->end;
-	printf("%d %d\n", thread_cmd->start, thread_cmd->end);
 	HANDLE h_file, h_append;
 	DWORD bytes_read, bytes_write;
 	char read_buffer, translate;
@@ -21,10 +26,8 @@ DWORD WINAPI translate_thread(LPVOID lpParam)
 		NULL);                 // no attr. template
 	if (h_file == INVALID_HANDLE_VALUE)
 	{
-		//DisplayError(TEXT("CreateFile"));
-		//_tprintf(TEXT("Terminal failure: unable to open file \"%s\" for read.\n"), argv[1]);
 		fprintf(stderr, "Could not open %s!.\n", input_file);
-		return ERROR;
+		return ERROR_CODE;
 	}
 	// Open the existing file, or if the file does not exist,
 	// create a new file.
@@ -39,9 +42,8 @@ DWORD WINAPI translate_thread(LPVOID lpParam)
 
 	if (h_append == INVALID_HANDLE_VALUE) {
 		fprintf(stderr, "Could not open %s!.\n", output_file);
-		return ERROR;
+		return ERROR_CODE;
 	}
-
 	SetFilePointer(h_file, start, 0, FILE_BEGIN);
 	SetFilePointer(h_append, start, 0, FILE_BEGIN);
 	if(end>=0)
@@ -52,17 +54,16 @@ DWORD WINAPI translate_thread(LPVOID lpParam)
 			{
 			fprintf(stderr, "File not read.\n");
 			CloseHandle(h_file);
-			return ERROR;
+			return ERROR_CODE;
 			}
 			else if (bytes_read==1)
 			{
-				//printf("%c=", read_buffer);
+			
 				translate = char_through_caesar(read_buffer, key);
-				//printf("%c\n", translate);
 				if (FALSE == WriteFile(h_append, &translate, 1, &bytes_write, NULL))
 				{
 					fprintf(stderr, "File not written to.\n");
-					return ERROR;
+					return ERROR_CODE;
 				}
 			}
 		}
@@ -73,4 +74,42 @@ DWORD WINAPI translate_thread(LPVOID lpParam)
 	if (CloseHandle(h_append) == 0)
 		fprintf(stderr,"%s file handle not closed successfully!\n", output_file);
 	return 0;
+}
+
+//  A function that evaluates if the char is digit/captial/small or special char
+//  Parameters: input char
+//  Return: char that indicates the type of the char
+char char_type(char input_char)
+{
+	if (input_char >= 48 && input_char <= 57)
+		return DIGIT;
+	if (input_char >= 65 && input_char <= 90)
+		return CAPITAL;
+	if (input_char >= 97 && input_char <= 122)
+		return SMALL;
+	else return ERROR_CODE;
+}
+
+//  A function that translates the char according to the key
+//  Parameters: input char and integer (key)
+//  Return: the translated char according to his key and type
+char char_through_caesar(char input_char, int key)
+{
+	char output_char, type;
+	type = char_type(input_char);
+	switch (type)
+	{
+	case CAPITAL:
+		output_char = CAPITAL + (input_char - CAPITAL - key + 26) % 26;
+		break;
+	case SMALL:
+		output_char = SMALL + (input_char - SMALL - key + 26) % 26;
+		break;
+	case DIGIT:
+		output_char = DIGIT + (input_char - DIGIT - key + 10) % 10;
+		break;
+	default:
+		output_char = input_char;
+	}
+	return output_char;
 }
