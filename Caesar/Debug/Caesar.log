@@ -1,0 +1,14 @@
+﻿  create_thread.c
+  info_to_threads.c
+C:\Users\יובל\source\repos\ex2\Caesar\info_to_threads.c(55,20): warning C4047: 'return': 'location *' differs in levels of indirection from 'int'
+C:\Users\יובל\source\repos\ex2\Caesar\info_to_threads.c(69,20): warning C4047: 'return': 'location *' differs in levels of indirection from 'int'
+C:\Users\יובל\source\repos\ex2\Caesar\info_to_threads.c(86,20): warning C4047: 'return': 'location *' differs in levels of indirection from 'int'
+C:\Users\יובל\source\repos\ex2\Caesar\info_to_threads.c(100,21): warning C4047: 'return': 'location *' differs in levels of indirection from 'int'
+C:\Users\יובל\source\repos\ex2\Caesar\info_to_threads.c(128,20): warning C4047: 'return': 'location *' differs in levels of indirection from 'int'
+C:\Users\יובל\source\repos\ex2\Caesar\info_to_threads.c(133,20): warning C4047: 'return': 'location *' differs in levels of indirection from 'int'
+  main.c
+C:\Users\יובל\source\repos\ex2\Caesar\main.c(76,18): warning C4047: '==': 'location *' differs in levels of indirection from 'int'
+  translate_thread.c
+  Generating Code...
+C:\Users\יובל\source\repos\ex2\Caesar\info_to_threads.c(169): warning C4172: returning address of local variable or temporary: path
+  Caesar.vcxproj -> C:\Users\יובל\source\repos\ex2\Debug\Caesar.exe
